@@ -11,6 +11,7 @@ The built-in correlation models submodule for the gaussian_process module.
 
 import numpy as np
 from ..utils import deprecated
+from . import kernels
 
 
 def absolute_exponential(theta, d):
@@ -283,3 +284,40 @@ def linear(theta, d):
     r = np.prod(ss, 1)
 
     return r
+
+    def matern32(theta,d):
+    """ Matern kernel.
+
+    The class of Matern kernels is a generalization of the RBF and the
+    absolute exponential kernel parameterized by an additional parameter
+    nu. The smaller nu, the less smooth the approximated function is.
+    For nu=inf, the kernel becomes equivalent to the RBF kernel and for nu=0.5
+    to the absolute exponential kernel. Important intermediate values are
+    nu=1.5 (once differentiable functions) and nu=2.5 (twice differentiable
+    functions).
+
+    See Rasmussen and Williams 2006, pp84 for details regarding the
+    different variants of the Matern kernel.
+
+    .. versionadded:: 0.18
+    """
+        return kernels.Matern()
+
+
+    def matern52(theta,d):
+    """ Matern kernel.
+
+    The class of Matern kernels is a generalization of the RBF and the
+    absolute exponential kernel parameterized by an additional parameter
+    nu. The smaller nu, the less smooth the approximated function is.
+    For nu=inf, the kernel becomes equivalent to the RBF kernel and for nu=0.5
+    to the absolute exponential kernel. Important intermediate values are
+    nu=1.5 (once differentiable functions) and nu=2.5 (twice differentiable
+    functions).
+
+    See Rasmussen and Williams 2006, pp84 for details regarding the
+    different variants of the Matern kernel.
+
+    .. versionadded:: 0.18
+    """
+        return kernels.Matern(nu=2.5)
