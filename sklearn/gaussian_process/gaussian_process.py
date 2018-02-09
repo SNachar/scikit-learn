@@ -7,6 +7,7 @@
 from __future__ import print_function
 
 import numpy as np
+from pyswarm import pso
 from scipy import linalg, optimize
 
 from ..base import BaseEstimator, RegressorMixin
@@ -19,9 +20,6 @@ from ..utils import deprecated
 
 MACHINE_EPSILON = np.finfo(np.double).eps
 
-
-@deprecated("l1_cross_distances was deprecated in version 0.18 "
-            "and will be removed in 0.20.")
 def l1_cross_distances(X):
     """
     Computes the nonzero componentwise L1 cross-distances between the vectors
@@ -59,14 +57,8 @@ def l1_cross_distances(X):
     return D, ij
 
 
-@deprecated("GaussianProcess was deprecated in version 0.18 and will be "
-            "removed in 0.20. Use the GaussianProcessRegressor instead.")
 class GaussianProcess(BaseEstimator, RegressorMixin):
     """The legacy Gaussian Process model class.
-
-    .. deprecated:: 0.18
-        This class will be removed in 0.20.
-        Use the :class:`GaussianProcessRegressor` instead.
 
     Read more in the :ref:`User Guide <gaussian_process>`.
 
@@ -155,11 +147,14 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
         Default uses 'fmin_cobyla' algorithm from scipy.optimize.
         Available optimizers are::
 
-            'fmin_cobyla', 'Welch'
+            'fmin_cobyla', 'Welch', 'pso'
 
         'Welch' optimizer is dued to Welch et al., see reference [WBSWM1992]_.
         It consists in iterating over several one-dimensional optimizations
         instead of running one single multi-dimensional optimization.
+
+        'pso' optimizer is for Particle Swarm Optimisation from Kennedy and
+        Eberhart, , see reference [PSO1995]_.
 
     random_start : int, optional
         The number of times the Maximum Likelihood Estimation should be
@@ -212,6 +207,9 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
         and M.D.  Morris (1992). Screening, predicting, and computer
         experiments.  Technometrics, 34(1) 15--25.`
         http://www.jstor.org/stable/1269548
+
+    .. [PSO1995] `J. Kennedy, R. Eberhart. Particle swarm optimization,
+        IEEE International Conference on Neural Networks, (1995)
     """
 
     _regression_types = {
@@ -228,7 +226,8 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
 
     _optimizer_types = [
         'fmin_cobyla',
-        'Welch']
+        'Welch',
+        'pso']
 
     def __init__(self, regr='constant', corr='squared_exponential', beta0=None,
                  storage_mode='full', verbose=False, theta0=1e-1,
@@ -385,7 +384,7 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
 
         return self
 
-    def predict(self, X, eval_MSE=False, batch_size=None):
+    def predict(self, X, return_std=False, batch_size=None):
         """
         This function evaluates the Gaussian Process model at x.
 
@@ -795,6 +794,24 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
             self.corr = corr
             self.optimizer = 'Welch'
             self.verbose = verbose
+
+        elif self.optimizer == 'pso':
+
+            def minus_reduced_likelihood_function(theta):
+                return -self.reduced_likelihood_function(
+                    theta=theta)[0]
+
+            # Run PSO
+            # try:
+            optimal_theta,score = \
+                pso(minus_reduced_likelihood_function, self.thetaL.tolist()[0], self.thetaU.tolist()[0],\
+                swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxiter=100, minstep=1e-8,
+                minfunc=1e-8, debug=False)
+            # except ValueError as ve:
+            #     print("Optimization failed. Try increasing the ``nugget``")
+            #     raise ve
+            optimal_rlf_value, optimal_par = \
+                self.reduced_likelihood_function(theta=optimal_theta)
 
         else:
 
