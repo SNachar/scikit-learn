@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import numpy as np
 from pyswarm import pso
+import inspect
 from scipy import linalg, optimize
 
 from ..base import BaseEstimator, RegressorMixin
@@ -16,6 +17,7 @@ from ..utils import check_random_state, check_array, check_X_y
 from ..utils.validation import check_is_fitted
 from . import regression_models as regression
 from . import correlation_models as correlation
+from . import kernels
 from ..utils import deprecated
 
 MACHINE_EPSILON = np.finfo(np.double).eps
@@ -248,6 +250,11 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
         self.optimizer = optimizer
         self.random_start = random_start
         self.random_state = random_state
+
+        list_class = tuple([c[1] for c in inspect.getmembers(kernels)])
+        if isinstance(self.corr,list_class):
+            K = self.corr
+            self.corr = lambda theta,x: K.clone_with_theta(theta=theta)(np.zeros([1,x.shape[1]]),x)
 
     def fit(self, X, y):
         """
