@@ -391,7 +391,7 @@ class GaussianProcess(BaseEstimator, RegressorMixin):
 
         return self
 
-    def predict(self, X, return_std=False, batch_size=None):
+    def predict(self, X, eval_MSE=False, batch_size=None):
         """
         This function evaluates the Gaussian Process model at x.
 
