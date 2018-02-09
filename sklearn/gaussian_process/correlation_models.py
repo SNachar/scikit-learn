@@ -13,8 +13,6 @@ import numpy as np
 from ..utils import deprecated
 
 
-@deprecated("The function absolute_exponential of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def absolute_exponential(theta, d):
     """
     Absolute exponential autocorrelation model.
@@ -57,8 +55,6 @@ def absolute_exponential(theta, d):
         return np.exp(- np.sum(theta.reshape(1, n_features) * d, axis=1))
 
 
-@deprecated("The function squared_exponential of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def squared_exponential(theta, d):
     """
     Squared exponential correlation model (Radial Basis Function).
@@ -102,8 +98,6 @@ def squared_exponential(theta, d):
         return np.exp(-np.sum(theta.reshape(1, n_features) * d ** 2, axis=1))
 
 
-@deprecated("The function generalized_exponential of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def generalized_exponential(theta, d):
     """
     Generalized exponential correlation model.
@@ -154,8 +148,6 @@ def generalized_exponential(theta, d):
     return r
 
 
-@deprecated("The function pure_nugget of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def pure_nugget(theta, d):
     """
     Spatial independence correlation model (pure nugget).
@@ -193,8 +185,6 @@ def pure_nugget(theta, d):
     return r
 
 
-@deprecated("The function cubic of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def cubic(theta, d):
     """
     Cubic correlation model::
@@ -245,8 +235,6 @@ def cubic(theta, d):
     return r
 
 
-@deprecated("The function linear of correlation_models is "
-            "deprecated in version 0.19.1 and will be removed in 0.22.")
 def linear(theta, d):
     """
     Linear correlation model::
